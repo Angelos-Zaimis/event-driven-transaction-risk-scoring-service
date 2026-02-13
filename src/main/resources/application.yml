@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: transaction-risk-engine
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/riskdb
+    username: risk
+    password: risk
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: transaction-risk-engine
+      auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
