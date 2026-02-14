@@ -50,6 +50,9 @@ public class TransactionEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    // Default constructor for JPA
+    protected TransactionEntity() {
+    }
 
     private TransactionEntity(
             String externalTransactionId,
