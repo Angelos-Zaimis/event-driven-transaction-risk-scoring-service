@@ -1,20 +1,29 @@
 package com.angelos.transaction_risk_engine.entity;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.angelos.transaction_risk_engine.enums.TransactionStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+
 @Entity
 @Table(name = "transactions")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class TransactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "external_transaction_id", nullable = false, unique = true, length = 64)
     private String externalTransactionId;
@@ -40,4 +49,53 @@ public class TransactionEntity {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+
+    private TransactionEntity(
+            String externalTransactionId,
+            String customerId,
+            int customerAge,
+            BigDecimal amount,
+            String currency,
+            String country
+    ) {
+        this.externalTransactionId = externalTransactionId;
+        this.customerId = customerId;
+        this.customerAge = customerAge;
+        this.amount = amount;
+        this.currency = currency;
+        this.country = country;
+        this.status = TransactionStatus.RECEIVED;
+        this.createdAt = Instant.now();
+    }
+
+    public static TransactionEntity create(
+            String externalTransactionId,
+            String customerId,
+            int customerAge,
+            BigDecimal amount,
+            String currency,
+            String country
+    ) {
+        if (amount == null || amount.signum() <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+
+        if (customerAge < 0 || customerAge > 120) {
+            throw new IllegalArgumentException("Invalid customer age");
+        }
+
+        return new TransactionEntity(
+                externalTransactionId,
+                customerId,
+                customerAge,
+                amount,
+                currency,
+                country
+        );
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
+    }
 }
